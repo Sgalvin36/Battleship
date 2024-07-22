@@ -46,6 +46,19 @@ RSpec.describe ComputerBrain do
         end
     end
 
+    describe "#random_shot" do
+        it 'returns a random key from array' do
+            shot = @computer.random_shot
+            expect(@player_board.cells.keys).to include shot
+        end
+
+        it 'removes the shot from the available shots' do
+            expect(@computer.keys.count).to eq 16
+            @computer.random_shot
+            expect(@computer.keys.count).to eq 15
+        end
+    end
+
     describe "#shot_check" do
         it 'sees if last show was a hit' do
             expect(@computer.shot_check('A1')).to eq true
@@ -100,6 +113,7 @@ RSpec.describe ComputerBrain do
                 expect(@computer.last_shot).to eq 'B2'
             end
         end
+
         describe "#direction changer" do
             it 'defaults to left' do
                 expect(@computer.direction).to eq 'left'
@@ -123,11 +137,38 @@ RSpec.describe ComputerBrain do
                 expect(@computer.direction).to eq 'down'
             end
         end
-        describe "row_hunt" do
-            xit 'attempts to fire on cell left of last shot' do
+
+        describe "next_shot" do
+            it 'takes last shot and current direction to determine new shot' do
+                @computer.store_hit('A2')
+                expect(@computer.next_shot(@computer.direction)).to eq 'A1'
             end
 
-            xit 'continues to go left til it misses or edge of map' do
+            it 'can move right' do
+                @computer.store_hit('B2')
+                @computer.change_direction
+                expect(@computer.next_shot(@computer.direction)).to eq 'B3'
+            end
+
+            it 'can move up' do
+                @computer.store_hit('B2')
+                @computer.change_direction
+                @computer.change_direction
+                expect(@computer.next_shot(@computer.direction)).to eq 'A2'
+            end
+
+            it 'can move down' do
+                @computer.store_hit('A2')
+                @computer.change_direction
+                @computer.change_direction
+                @computer.change_direction
+                expect(@computer.next_shot(@computer.direction)).to eq 'B2'
+            end
+        end
+
+        describe "row_hunt" do
+            it 'continues to go left til it misses or edge of map' do
+                @computer.store_hit('A2')
             end
 
             xit 'attempts to fire on right cell from the first hit' do
