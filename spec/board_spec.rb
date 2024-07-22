@@ -58,9 +58,6 @@ RSpec.describe Board do
         end
     end
   
-
-
-
     describe '#valid_placement?' do
         describe '#match_length?' do
             it 'reads the arguments' do

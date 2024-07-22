@@ -1,0 +1,2 @@
+class ComputerBrain
+end
