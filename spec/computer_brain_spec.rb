@@ -83,11 +83,47 @@ RSpec.describe ComputerBrain do
                 expect(@computer.first_hit).to eq 'A1'
                 expect(@computer.hits).to eq ['A1', 'A2']
             end
-        end
-        describe "row_hunt" do
-            xit 'assigns all collected hits to array' do
+
+            it 'doesnt add to hits if the sequential hit misses' do
+                @computer.store_hit('A1')
+                @computer.store_hit('C2')
+
+                expect(@computer.first_hit).to eq 'A1'
+                expect(@computer.hits).to eq ['A1']
             end
 
+            it 'updates last shot' do
+                @computer.store_hit('A1')
+                expect(@computer.last_shot).to eq 'A1'
+
+                @computer.store_hit('B2')
+                expect(@computer.last_shot).to eq 'B2'
+            end
+        end
+        describe "#direction changer" do
+            it 'defaults to left' do
+                expect(@computer.direction).to eq 'left'
+            end
+
+            it 'can go right' do
+                @computer.change_direction
+                expect(@computer.direction).to eq 'right'
+            end
+
+            it 'can go up' do
+                @computer.change_direction
+                @computer.change_direction
+                expect(@computer.direction).to eq 'up'
+            end
+
+            it 'can go down' do
+                @computer.change_direction
+                @computer.change_direction
+                @computer.change_direction
+                expect(@computer.direction).to eq 'down'
+            end
+        end
+        describe "row_hunt" do
             xit 'attempts to fire on cell left of last shot' do
             end
 

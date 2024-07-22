@@ -2,16 +2,18 @@ class ComputerBrain
     attr_accessor :keys, 
                   :board, 
                   :first_hit, 
-                  :hits
+                  :hits,
+                  :last_shot
 
     def initialize(player_board)
         @keys = player_board.cells.keys
         @board = player_board
         @level_difficulty = 0
         @first_hit = ""
+        @hits = []
+        @last_shot = ""
         @column_row_flop = true
         @miss_1 = ""
-        @hits = []
     end
 
     def computer_input(level_difficulty = @level_difficulty)
@@ -30,15 +32,14 @@ class ComputerBrain
     end
 
     def shot_check(shot)
-        if @board.cells[shot].empty?
-            false
-        else
-            true
-        end
+        !@board.cells[shot].empty?
     end
 
     def store_hit(shot)
-        @hits << shot
-        @first_hit = @hits[0]
+        if shot_check(shot)
+            @hits << shot
+            @first_hit = @hits[0]
+        end
+        @last_shot = shot
     end
 end
