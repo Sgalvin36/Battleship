@@ -1,5 +1,8 @@
 class ComputerBrain
-    attr_accessor :keys, :board
+    attr_accessor :keys, 
+                  :board, 
+                  :first_hit, 
+                  :hits
 
     def initialize(player_board)
         @keys = player_board.cells.keys
@@ -26,4 +29,16 @@ class ComputerBrain
         keys.shuffle!
     end
 
+    def shot_check(shot)
+        if @board.cells[shot].empty?
+            false
+        else
+            true
+        end
+    end
+
+    def store_hit(shot)
+        @hits << shot
+        @first_hit = @hits[0]
+    end
 end

@@ -48,68 +48,91 @@ RSpec.describe ComputerBrain do
 
     describe "#shot_check" do
         it 'sees if last show was a hit' do
+            expect(@computer.shot_check('A1')).to eq true
+            expect(@computer.shot_check('C1')).to eq false
         end
 
         it 'initiates shot_hunt if last shot was hit' do
+            first_shot = @computer.shot_check('A1')
+            @computer.keys.delete('A1')
+            expect(first_shot).to eq true
         end
 
         it 'calls another random shot if last shot was miss' do
+            @computer.shot_check('C1')
+            @computer.keys.delete('C1')
+            shot = @computer.computer_input
+            expect(shot).to be_a String
+            expect(shot).not_to eq 'C1'
         end
     end
 
     describe "shot_hunt" do
-        describe "row_hunt" do
+        describe "store_shot" do
             it 'stores last random shot as first hit' do
+                @computer.store_hit('A1')
+                
+                expect(@computer.first_hit).to eq 'A1'
+                expect(@computer.hits).to eq ['A1']
             end
 
-            it 'assigns all collected hits to array' do
+            it 'doesnt change first_hit with sequential hits' do
+                @computer.store_hit('A1')
+                @computer.store_hit('A2')
+
+                expect(@computer.first_hit).to eq 'A1'
+                expect(@computer.hits).to eq ['A1', 'A2']
+            end
+        end
+        describe "row_hunt" do
+            xit 'assigns all collected hits to array' do
             end
 
-            it 'attempts to fire on cell left of last shot' do
+            xit 'attempts to fire on cell left of last shot' do
             end
 
-            it 'continues to go left til it misses or edge of map' do
+            xit 'continues to go left til it misses or edge of map' do
             end
 
-            it 'attempts to fire on right cell from the first hit' do
+            xit 'attempts to fire on right cell from the first hit' do
             end
 
-            it 'continues to go right til it misses or edge of map' do
+            xit 'continues to go right til it misses or edge of map' do
             end
 
-            it 'breaks the hunt if sunk? returns true' do
+            xit 'breaks the hunt if sunk? returns true' do
             end
 
-            it 'removes all hits associated with sunk ship' do
+            xit 'removes all hits associated with sunk ship' do
             end
 
-            it 'continues hunt if any hits are still in array' do
+            xit 'continues hunt if any hits are still in array' do
             end
 
-            it 'discovers both misses but has not sunk ship, switch to column hunt' do
+            xit 'discovers both misses but has not sunk ship, switch to column hunt' do
             end
         end
 
         describe "column_hunt" do
-            it 'grabs first element from array assings it to first_hit' do
+            xit 'grabs first element from array assings it to first_hit' do
             end
 
-            it 'attempts to fire on cell up from first_hit' do
+            xit 'attempts to fire on cell up from first_hit' do
             end
 
-            it 'continues to fire up until miss or edge of board' do
+            xit 'continues to fire up until miss or edge of board' do
             end
 
-            it 'attempts to fire on cell down from first_hit' do
+            xit 'attempts to fire on cell down from first_hit' do
             end
 
-            it 'continues to fire down until miss or edge of board' do
+            xit 'continues to fire down until miss or edge of board' do
             end
 
-            it 'breaks the hunt if sunk? returns true' do
+            xit 'breaks the hunt if sunk? returns true' do
             end
 
-            it 'moves to next element in array and begins process again' do
+            xit 'moves to next element in array and begins process again' do
             end
         end
     end
