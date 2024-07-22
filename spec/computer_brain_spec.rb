@@ -166,10 +166,26 @@ RSpec.describe ComputerBrain do
             end
         end
 
-        describe "row_hunt" do
-            it 'continues to go left til it misses or edge of map' do
+        describe "#aimed_shot" do
+            it 'finds the next shot' do
                 @computer.store_hit('A2')
+                expect(@computer.aimed_shot).to eq 'A1'
             end
+
+            it 'checks if the shot is on the board' do
+                @computer.store_hit('A2')
+                expect(@computer.valid_shot?(@computer.next_shot(@computer.direction))).to eq true
+            end
+
+            it 'removes the shot from available pool' do
+                @computer.store_hit('A2')
+                @computer.keys.delete('A2')
+                @computer.aimed_shot
+                expect(@computer.keys.count).to eq 14
+            end
+        end
+
+        describe "row_hunt" do
 
             xit 'attempts to fire on right cell from the first hit' do
             end

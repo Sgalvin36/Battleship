@@ -36,6 +36,7 @@ class ComputerBrain
 
     def random_shot
         shot = @keys.sample
+        store_hit(shot)
         @keys.delete(shot)
         computer_shuffle(@keys)
         shot
@@ -74,5 +75,20 @@ class ComputerBrain
             var_1 += 1
         end
         "#{var_1.chr}#{var_2}"
+    end
+
+    def aimed_shot
+        shot = next_shot(@direction)
+        if valid_shot?(shot)
+            store_hit(shot)
+            @keys.delete(shot)
+            shot
+        else
+            false
+        end
+    end
+
+    def valid_shot?(shot)
+        @keys.include?(shot) 
     end
 end
