@@ -79,16 +79,26 @@ class ComputerBrain
 
     def aimed_shot
         shot = next_shot(@direction)
-        if valid_shot?(shot)
-            store_hit(shot)
-            @keys.delete(shot)
-            shot
-        else
-            false
-        end
+        return false unless valid_shot?(shot)
+        shot = missed(shot)
+        store_hit(shot)
+        @keys.delete(shot)
+        shot
     end
 
     def valid_shot?(shot)
         @keys.include?(shot) 
+    end
+
+    def missed(shot)
+    #    if !shot_check(shot)
+    #     change_direction
+    #     @first_hit
+    #    else
+    #     shot
+    #    end
+      return shot unless !shot_check(shot)
+      change_direction
+      @first_hit  
     end
 end

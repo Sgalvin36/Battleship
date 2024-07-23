@@ -186,11 +186,26 @@ RSpec.describe ComputerBrain do
         end
 
         describe "row_hunt" do
-
-            xit 'attempts to fire on right cell from the first hit' do
+            it 'attempts to fire on right cell from the first hit' do
+                @computer.store_hit('A2')
+                @computer.keys.delete('A2')
+                shot = @computer.aimed_shot
+                expect(shot).to be_truthy
+                expect(shot).to eq 'A1'
             end
 
-            xit 'continues to go right til it misses or edge of map' do
+            it 'continues to go right til edge of map' do
+                @computer.store_hit('A2')
+                @computer.keys.delete('A2')
+                @computer.aimed_shot
+                expect(@computer.aimed_shot).to eq false
+            end
+
+            it 'continues to go right til it misses' do
+                @computer.store_hit('B2')
+                @computer.keys.delete('B2')
+                @computer.aimed_shot
+                expect(@computer.aimed_shot).to eq 'B2'
             end
 
             xit 'breaks the hunt if sunk? returns true' do
