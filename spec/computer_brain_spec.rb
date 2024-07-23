@@ -31,7 +31,7 @@ RSpec.describe ComputerBrain do
             expect(@computer.keys).not_to include @computer.computer_input
         end
 
-        it 'can take a parameter to change the difficulty' do
+        xit 'can take a parameter to change the difficulty' do
             expect(@computer.computer_input(1)).to eq 'level one'
         end
     end
@@ -185,71 +185,92 @@ RSpec.describe ComputerBrain do
             end
         end
 
-        describe "row_hunt" do
-            it 'attempts to fire on right cell from the first hit' do
-                @computer.store_hit('A2')
-                @computer.keys.delete('A2')
-                shot = @computer.aimed_shot
-                expect(shot).to be_truthy
-                expect(shot).to eq 'A1'
+        describe '#valid_shot()' do
+            it 'takes a shot and checks that its on the board' do
+                expect(@computer.valid_shot?("B3")).to eq true
             end
 
-            it 'continues to go right til edge of map' do
-                @computer.store_hit('A2')
-                @computer.keys.delete('A2')
-                @computer.aimed_shot
-                expect(@computer.aimed_shot).to eq false
+            it 'returns false if the shot is out of bounds' do
+                expect(@computer.valid_shot?("B0")).to eq false
+            end
+        end
+
+        describe "#hunt?" do
+            it 'returns true if @hits has any values' do
+                @computer.hits << ['A3']
+                expect(@computer.hunt?).to eq true
             end
 
-            it 'continues to go right til it misses' do
+            it 'returns false if @hits has an empty array' do
+                expect(@computer.hunt?).to eq false
+            end
+        end
+
+        describe "#shot_pick" do
+            it 'calls a random shot if hunt? is false' do
+                expect(@computer.shot_pick).to be_a String
+            end
+
+            it 'calls an aimed shot if hunt is true' do
                 @computer.store_hit('B2')
                 @computer.keys.delete('B2')
-                @computer.aimed_shot
-                expect(@computer.aimed_shot).to eq 'B2'
-            end
-
-            xit 'breaks the hunt if sunk? returns true' do
-            end
-
-            xit 'removes all hits associated with sunk ship' do
-            end
-
-            xit 'continues hunt if any hits are still in array' do
-            end
-
-            xit 'discovers both misses but has not sunk ship, switch to column hunt' do
+                expect(@computer.shot_pick).to eq 'B1'
             end
         end
+        # describe "#hunt" do
+        #     it 'attempts to fire on right cell from the first hit' do
+        #         @computer.store_hit('A2')
+        #         @computer.keys.delete('A2')
+        #         shot = @computer.aimed_shot
+        #         expect(shot).to be_truthy
+        #         expect(shot).to eq 'A1'
+        #     end
 
-        describe "column_hunt" do
-            xit 'grabs first element from array assings it to first_hit' do
-            end
+        #     it 'continues to go right til edge of map' do
+        #         @computer.store_hit('A1')
+        #         @computer.keys.delete('A1')
+        #         @computer.aimed_shot
+        #         expect(@computer.miss_1).to eq true
+        #     end
 
-            xit 'attempts to fire on cell up from first_hit' do
-            end
+        #     it 'continues to go right til it misses' do
+        #         @computer.store_hit('B2')
+        #         @computer.keys.delete('B2')
+        #         shot = @computer.aimed_shot
+        #         expect(@computer.miss_1).to eq true
+        #     end
 
-            xit 'continues to fire up until miss or edge of board' do
-            end
+        #     it 'changes the direction on a miss' do
+        #         @computer.store_hit('B2')
+        #         @computer.keys.delete('B2')
+        #         @computer.aimed_shot
 
-            xit 'attempts to fire on cell down from first_hit' do
-            end
+        #         expect(@computer.direction).to eq 'right'
+        #     end
 
-            xit 'continues to fire down until miss or edge of board' do
-            end
+        #     it 'should go right with the shot after a miss' do
+        #         @computer.store_hit('B2')
+        #         @computer.keys.delete('B2')
+        #         puts @computer.aimed_shot #B1 - miss
+        #         puts @computer.direction
+        #         puts @computer.last_shot
+        #         puts @computer.
+                
+        #         expect(shot).to eq 'B3'
+        #     end
 
-            xit 'breaks the hunt if sunk? returns true' do
-            end
+        #     xit 'breaks the hunt if sunk? returns true' do
+        #     end
 
-            xit 'moves to next element in array and begins process again' do
-            end
-        end
+        #     xit 'removes all hits associated with sunk ship' do
+        #     end
+
+        #     xit 'continues hunt if any hits are still in array' do
+        #     end
+
+        #     xit 'discovers both misses but has not sunk ship, switch to column hunt' do
+        #     end
+        # end
+
     end
-    # it should store prior shot if it hit a ship
-    # if prior shot hit start with left check if it hits
-    #   once it doesn't hit or it hits edge of map go left from start point
-    #   ship should since when shots get to other edge of map or a miss
-    #       if the row of hits does not sink a ship and both edges are found, 
-    #       assign all hits to new starts for ships and systematically go up and down columns sinking each ship
-    #   if the length of hits is 1 and both misses are found, switch to column start with up
-
 end

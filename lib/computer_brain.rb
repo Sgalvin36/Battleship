@@ -3,7 +3,8 @@ class ComputerBrain
                   :board, 
                   :first_hit, 
                   :hits,
-                  :last_shot
+                  :last_shot,
+                  :miss_1
 
     def initialize(player_board)
         @keys = player_board.cells.keys
@@ -15,12 +16,12 @@ class ComputerBrain
         @directions = ['left', 'right', 'up', 'down']
         @direction_mode = 0
         @direction = @directions[@direction_mode]
-        @miss_1 = ""
+        @miss_1 = false
     end
 
     def computer_input(level_difficulty = @level_difficulty)
         if level_difficulty == 1
-            'level one'
+            level_one_brain
         else
             random_shot
         end
@@ -78,9 +79,11 @@ class ComputerBrain
     end
 
     def aimed_shot
+        @last_shot = @first_hit unless @miss_1 = false
+        @miss_1 = false
         shot = next_shot(@direction)
-        return false unless valid_shot?(shot)
-        shot = missed(shot)
+        @miss_1 = true unless valid_shot?(shot) && shot_check(shot)
+        change_direction unless @miss_1 == false
         store_hit(shot)
         @keys.delete(shot)
         shot
@@ -90,15 +93,26 @@ class ComputerBrain
         @keys.include?(shot) 
     end
 
-    def missed(shot)
-    #    if !shot_check(shot)
-    #     change_direction
-    #     @first_hit
-    #    else
-    #     shot
-    #    end
-      return shot unless !shot_check(shot)
-      change_direction
-      @first_hit  
+    def sunk(shot)
+        return false unless !@board.cells.ship.sunk?            
+        # get all coordinates of ship
+        ships_coordinates.each do |coord| 
+            @hits.remove(coord)
+        end
+    end
+
+    def hunt?
+        @hits.count > 0
+    end
+
+    def shot_pick
+        return random_shot unless hunt?
+        aimed_shot
+    end
+
+    def level_one_brain
+        shot = shot_pick
+        sunk(shot) unless !shot_check(shot)
+        @first_hit = @hits[0]
     end
 end
