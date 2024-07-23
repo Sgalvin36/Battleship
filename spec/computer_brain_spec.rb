@@ -141,20 +141,20 @@ RSpec.describe ComputerBrain do
         describe "next_shot" do
             it 'takes last shot and current direction to determine new shot' do
                 @computer.store_hit('A2')
-                expect(@computer.next_shot(@computer.direction)).to eq 'A1'
+                expect(@computer.next_shot(@computer.direction, 'A2')).to eq 'A1'
             end
 
             it 'can move right' do
                 @computer.store_hit('B2')
                 @computer.change_direction
-                expect(@computer.next_shot(@computer.direction)).to eq 'B3'
+                expect(@computer.next_shot(@computer.direction, 'B2')).to eq 'B3'
             end
 
             it 'can move up' do
                 @computer.store_hit('B2')
                 @computer.change_direction
                 @computer.change_direction
-                expect(@computer.next_shot(@computer.direction)).to eq 'A2'
+                expect(@computer.next_shot(@computer.direction, 'B2')).to eq 'A2'
             end
 
             it 'can move down' do
@@ -162,7 +162,7 @@ RSpec.describe ComputerBrain do
                 @computer.change_direction
                 @computer.change_direction
                 @computer.change_direction
-                expect(@computer.next_shot(@computer.direction)).to eq 'B2'
+                expect(@computer.next_shot(@computer.direction, 'A2')).to eq 'B2'
             end
         end
 
@@ -174,7 +174,7 @@ RSpec.describe ComputerBrain do
 
             it 'checks if the shot is on the board' do
                 @computer.store_hit('A2')
-                expect(@computer.valid_shot?(@computer.next_shot(@computer.direction))).to eq true
+                expect(@computer.valid_shot?(@computer.next_shot(@computer.direction, 'A2'))).to eq true
             end
 
             it 'removes the shot from available pool' do
@@ -182,6 +182,72 @@ RSpec.describe ComputerBrain do
                 @computer.keys.delete('A2')
                 @computer.aimed_shot
                 expect(@computer.keys.count).to eq 14
+            end
+
+            it 'checks if last shot is hit and moves on without changing' do
+                @computer.store_hit('A2')
+                @computer.keys.delete('A2')
+                expect(@computer.last_shot).to eq 'A2'
+                expect(@computer.direction).to eq 'left'
+                @computer.aimed_shot
+
+                expect(@computer.last_shot).to eq 'A1'
+                expect(@computer.direction).to eq 'left'
+            end
+
+            it 'checks if last shot is miss and changes direction' do
+                @computer.store_hit('B2')
+                @computer.keys.delete('B2')
+                expect(@computer.last_shot).to eq 'B2'
+                expect(@computer.direction).to eq 'left'
+                expect(@computer.miss).to eq false
+                @computer.aimed_shot
+
+                expect(@computer.last_shot).to eq 'B1'
+                expect(@computer.direction).to eq 'right'
+                expect(@computer.miss).to eq true
+            end
+
+            it 'attempts to fire on right cell from the first hit' do
+                @computer.store_hit('A2')
+                @computer.keys.delete('A2')
+                shot = @computer.aimed_shot
+                
+                expect(shot).to be_truthy
+                expect(shot).to eq 'A1'
+            end
+
+            it 'continues to go right til edge of map' do
+                @computer.store_hit('A1')
+                @computer.keys.delete('A1')
+                @computer.aimed_shot
+                
+                expect(@computer.miss).to eq true
+            end
+
+            it 'continues to go right til it misses' do
+                @computer.store_hit('B2')
+                @computer.keys.delete('B2')
+                @computer.aimed_shot
+                
+                expect(@computer.miss).to eq true
+            end
+
+            it 'changes the direction on a miss' do
+                @computer.store_hit('B2')
+                @computer.keys.delete('B2')
+                @computer.aimed_shot
+
+                expect(@computer.direction).to eq 'right'
+            end
+
+            it 'should go right with the shot after a miss' do
+                @computer.store_hit('B2')
+                @computer.keys.delete('B2')
+                @computer.aimed_shot
+                shot = @computer.aimed_shot
+
+                expect(shot).to eq 'B3'
             end
         end
 
@@ -195,6 +261,25 @@ RSpec.describe ComputerBrain do
             end
         end
 
+        describe '#reset_miss' do
+            it 'does not set last_shot to first hit if miss = false' do
+                @computer.last_shot = 'A1'
+                @computer.first_hit = 'B3'
+                @computer.reset_miss
+
+                expect(@computer.last_shot).to eq 'A1'
+            end
+
+            it 'does set last_shot to first_hit if miss = true' do
+                @computer.last_shot = 'A1'
+                @computer.first_hit = 'B3'
+                @computer.miss = true
+                @computer.reset_miss
+
+                expect(@computer.last_shot).to eq 'B3'
+            end
+        end
+        
         describe "#hunt?" do
             it 'returns true if @hits has any values' do
                 @computer.hits << ['A3']
@@ -217,60 +302,27 @@ RSpec.describe ComputerBrain do
                 expect(@computer.shot_pick).to eq 'B1'
             end
         end
+
         # describe "#hunt" do
-        #     it 'attempts to fire on right cell from the first hit' do
-        #         @computer.store_hit('A2')
-        #         @computer.keys.delete('A2')
-        #         shot = @computer.aimed_shot
-        #         expect(shot).to be_truthy
-        #         expect(shot).to eq 'A1'
-        #     end
-
-        #     it 'continues to go right til edge of map' do
-        #         @computer.store_hit('A1')
-        #         @computer.keys.delete('A1')
-        #         @computer.aimed_shot
-        #         expect(@computer.miss_1).to eq true
-        #     end
-
-        #     it 'continues to go right til it misses' do
-        #         @computer.store_hit('B2')
-        #         @computer.keys.delete('B2')
-        #         shot = @computer.aimed_shot
-        #         expect(@computer.miss_1).to eq true
-        #     end
-
-        #     it 'changes the direction on a miss' do
-        #         @computer.store_hit('B2')
-        #         @computer.keys.delete('B2')
-        #         @computer.aimed_shot
-
-        #         expect(@computer.direction).to eq 'right'
-        #     end
-
-        #     it 'should go right with the shot after a miss' do
-        #         @computer.store_hit('B2')
-        #         @computer.keys.delete('B2')
-        #         puts @computer.aimed_shot #B1 - miss
-        #         puts @computer.direction
-        #         puts @computer.last_shot
-        #         puts @computer.
+    
+        #     # it 'should go right with the shot after a miss' do
+        #     #     @computer.store_hit('B2')
+        #     #     @computer.keys.delete('B2')
                 
-        #         expect(shot).to eq 'B3'
-        #     end
+        #     #     expect(shot).to eq 'B3'
+        #     # # end
 
-        #     xit 'breaks the hunt if sunk? returns true' do
-        #     end
+        #     # xit 'breaks the hunt if sunk? returns true' do
+        #     # end
 
-        #     xit 'removes all hits associated with sunk ship' do
-        #     end
+        #     # xit 'removes all hits associated with sunk ship' do
+        #     # end
 
-        #     xit 'continues hunt if any hits are still in array' do
-        #     end
+        #     # xit 'continues hunt if any hits are still in array' do
+        #     # end
 
-        #     xit 'discovers both misses but has not sunk ship, switch to column hunt' do
-        #     end
+        #     # xit 'discovers both misses but has not sunk ship, switch to column hunt' do
+        #     # end
         # end
-
     end
 end

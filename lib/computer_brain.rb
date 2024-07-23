@@ -4,7 +4,7 @@ class ComputerBrain
                   :first_hit, 
                   :hits,
                   :last_shot,
-                  :miss_1
+                  :miss
 
     def initialize(player_board)
         @keys = player_board.cells.keys
@@ -16,7 +16,7 @@ class ComputerBrain
         @directions = ['left', 'right', 'up', 'down']
         @direction_mode = 0
         @direction = @directions[@direction_mode]
-        @miss_1 = false
+        @miss = false
     end
 
     def computer_input(level_difficulty = @level_difficulty)
@@ -63,9 +63,9 @@ class ComputerBrain
         @direction = @directions[@direction_mode]
     end
 
-    def next_shot(direction)
-        var_1 = @last_shot[0].ord
-        var_2 = @last_shot[1].to_i
+    def next_shot(direction, shot)
+        var_1 = shot[0].ord
+        var_2 = shot[1].to_i
         if direction == 'left'
             var_2 -= 1
         elsif direction == 'right'
@@ -79,11 +79,10 @@ class ComputerBrain
     end
 
     def aimed_shot
-        @last_shot = @first_hit unless @miss_1 = false
-        @miss_1 = false
-        shot = next_shot(@direction)
-        @miss_1 = true unless valid_shot?(shot) && shot_check(shot)
-        change_direction unless @miss_1 == false
+        reset_miss
+        shot = next_shot(@direction, @last_shot)
+        @miss = true unless valid_shot?(shot) && shot_check(shot)
+        change_direction unless @miss == false
         store_hit(shot)
         @keys.delete(shot)
         shot
@@ -91,6 +90,11 @@ class ComputerBrain
 
     def valid_shot?(shot)
         @keys.include?(shot) 
+    end
+
+    def reset_miss
+        @last_shot = @first_hit unless !@miss
+        @miss = false
     end
 
     def sunk(shot)
