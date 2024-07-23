@@ -109,8 +109,8 @@ RSpec.describe ComputerBrain do
                 @computer.store_hit('A1')
                 expect(@computer.last_shot).to eq 'A1'
 
-                @computer.store_hit('B2')
-                expect(@computer.last_shot).to eq 'B2'
+                @computer.store_hit('C2')
+                expect(@computer.last_shot).to eq 'C2'
             end
         end
 
@@ -245,9 +245,24 @@ RSpec.describe ComputerBrain do
                 @computer.store_hit('B2')
                 @computer.keys.delete('B2')
                 @computer.aimed_shot
-                shot = @computer.aimed_shot
+                
+                expect(@computer.miss).to eq true
+                expect(@computer.direction).to eq 'right'
+                expect(@computer.last_shot).to eq 'B1'
+                expect(@computer.first_hit).to eq 'B2'
 
-                expect(shot).to eq 'B3'
+                expect(@computer.aimed_shot).to eq 'B3'
+            end
+
+            it 'should keep going right until it misses or sinks' do
+                @computer.store_hit('B2')
+                @computer.keys.delete('B2')
+
+                expect(@computer.board.cells['B2'].ship.sunk?).to eq false
+                @computer.aimed_shot #B1
+                shot = @computer.aimed_shot #b3
+                # require 'pry';binding.pry
+                expect(@computer.board.cells[shot].ship.sunk?).to eq true
             end
         end
 
@@ -279,7 +294,7 @@ RSpec.describe ComputerBrain do
                 expect(@computer.last_shot).to eq 'B3'
             end
         end
-        
+
         describe "#hunt?" do
             it 'returns true if @hits has any values' do
                 @computer.hits << ['A3']

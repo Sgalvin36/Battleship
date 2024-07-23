@@ -81,19 +81,19 @@ class ComputerBrain
     def aimed_shot
         reset_miss
         shot = next_shot(@direction, @last_shot)
-        @miss = true unless valid_shot?(shot) && shot_check(shot)
-        change_direction unless @miss == false
+        @miss = true if !valid_shot?(shot) || !shot_check(shot)
+        change_direction if @miss
         store_hit(shot)
         @keys.delete(shot)
         shot
     end
 
     def valid_shot?(shot)
-        @keys.include?(shot) 
+        @board.cells.include?(shot) 
     end
 
     def reset_miss
-        @last_shot = @first_hit unless !@miss
+        @last_shot = @first_hit if @miss
         @miss = false
     end
 
