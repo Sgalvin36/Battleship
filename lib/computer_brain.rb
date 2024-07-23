@@ -1,13 +1,16 @@
 class ComputerBrain
-    attr_accessor :keys, 
+    attr_accessor :keys,
+                  :set_keys, 
                   :board, 
                   :first_hit, 
                   :hits,
                   :last_shot,
-                  :miss
+                  :miss,
+                  :direction_mode
 
     def initialize(player_board)
         @keys = player_board.cells.keys
+        @set_keys = player_board.cells.keys
         @board = player_board
         @level_difficulty = 0
         @first_hit = ""
@@ -52,11 +55,9 @@ class ComputerBrain
     end
 
     def change_direction
-        if @direction_mode <= 3
-            @direction_mode += 1
-        else
-            @direction_mode = 0
-        end
+        @direction_mode += 1
+        @direction_mode = 0 if @direction_mode > 3
+        @direction_mode
     end
 
     def direction
@@ -80,16 +81,25 @@ class ComputerBrain
 
     def aimed_shot
         reset_miss
-        shot = next_shot(@direction, @last_shot)
-        @miss = true if !valid_shot?(shot) || !shot_check(shot)
+        shoot_next = next_shot(@direction, @last_shot) 
+        change_direction if !on_board?(shoot_next)
+        until valid_shot?(shoot_next) do
+            @direction = @directions[@direction_mode]
+            shoot_next = next_shot(@direction, shoot_next)
+        end
+        @miss = true if !shot_check(shoot_next)
         change_direction if @miss
-        store_hit(shot)
-        @keys.delete(shot)
-        shot
+        store_hit(shoot_next)
+        @keys.delete(shoot_next)
+        @last_shot = shoot_next
+    end
+
+    def on_board?(shot)
+        @set_keys.include?(shot)
     end
 
     def valid_shot?(shot)
-        @board.cells.include?(shot) 
+        @keys.include?(shot) 
     end
 
     def reset_miss

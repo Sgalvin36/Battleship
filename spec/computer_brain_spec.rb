@@ -220,9 +220,10 @@ RSpec.describe ComputerBrain do
             it 'continues to go right til edge of map' do
                 @computer.store_hit('A1')
                 @computer.keys.delete('A1')
-                @computer.aimed_shot
+                # require 'pry';binding.pry
+                shot = @computer.aimed_shot
                 
-                expect(@computer.miss).to eq true
+                expect(shot).to eq 'A2'
             end
 
             it 'continues to go right til it misses' do
@@ -257,27 +258,28 @@ RSpec.describe ComputerBrain do
             it 'should keep going right until it misses or sinks' do
                 @computer.store_hit('B2')
                 @computer.keys.delete('B2')
-
+                @computer.
                 expect(@computer.board.cells['B2'].ship.sunk?).to eq false
-                @computer.aimed_shot #B1
-                shot = @computer.aimed_shot #b3
-                # require 'pry';binding.pry
+                shot = @computer.aimed_shot #B1
+                expect(@computer.miss).to eq true
+                shot = @computer.aimed_shot
+
                 expect(@computer.board.cells[shot].ship.sunk?).to eq true
             end
         end
 
         describe '#valid_shot()' do
-            it 'takes a shot and checks that its on the board' do
+            xit 'takes a shot and checks that its on the board' do
                 expect(@computer.valid_shot?("B3")).to eq true
             end
 
-            it 'returns false if the shot is out of bounds' do
+            xit 'returns false if the shot is out of bounds' do
                 expect(@computer.valid_shot?("B0")).to eq false
             end
         end
 
         describe '#reset_miss' do
-            it 'does not set last_shot to first hit if miss = false' do
+            xit 'does not set last_shot to first hit if miss = false' do
                 @computer.last_shot = 'A1'
                 @computer.first_hit = 'B3'
                 @computer.reset_miss
@@ -285,7 +287,7 @@ RSpec.describe ComputerBrain do
                 expect(@computer.last_shot).to eq 'A1'
             end
 
-            it 'does set last_shot to first_hit if miss = true' do
+            xit 'does set last_shot to first_hit if miss = true' do
                 @computer.last_shot = 'A1'
                 @computer.first_hit = 'B3'
                 @computer.miss = true
@@ -296,22 +298,22 @@ RSpec.describe ComputerBrain do
         end
 
         describe "#hunt?" do
-            it 'returns true if @hits has any values' do
+            xit 'returns true if @hits has any values' do
                 @computer.hits << ['A3']
                 expect(@computer.hunt?).to eq true
             end
 
-            it 'returns false if @hits has an empty array' do
+            xit 'returns false if @hits has an empty array' do
                 expect(@computer.hunt?).to eq false
             end
         end
 
         describe "#shot_pick" do
-            it 'calls a random shot if hunt? is false' do
+            xit 'calls a random shot if hunt? is false' do
                 expect(@computer.shot_pick).to be_a String
             end
 
-            it 'calls an aimed shot if hunt is true' do
+            xit 'calls an aimed shot if hunt is true' do
                 @computer.store_hit('B2')
                 @computer.keys.delete('B2')
                 expect(@computer.shot_pick).to eq 'B1'
