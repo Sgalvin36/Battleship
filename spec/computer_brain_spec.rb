@@ -255,31 +255,32 @@ RSpec.describe ComputerBrain do
                 expect(@computer.aimed_shot).to eq 'B3'
             end
 
-            it 'should keep going right until it misses or sinks' do
+            it 'should keep going right until sinks' do
                 @computer.store_hit('B2')
                 @computer.keys.delete('B2')
-                @computer.
+                @computer.board.cells['B2'].fire_upon
                 expect(@computer.board.cells['B2'].ship.sunk?).to eq false
                 shot = @computer.aimed_shot #B1
                 expect(@computer.miss).to eq true
                 shot = @computer.aimed_shot
+                @computer.board.cells[shot].fire_upon
 
                 expect(@computer.board.cells[shot].ship.sunk?).to eq true
             end
         end
 
-        describe '#valid_shot()' do
-            xit 'takes a shot and checks that its on the board' do
+        describe '#valid_shot' do
+            it 'takes a shot and checks that its on the board' do
                 expect(@computer.valid_shot?("B3")).to eq true
             end
 
-            xit 'returns false if the shot is out of bounds' do
+            it 'returns false if the shot is out of bounds' do
                 expect(@computer.valid_shot?("B0")).to eq false
             end
         end
 
         describe '#reset_miss' do
-            xit 'does not set last_shot to first hit if miss = false' do
+            it 'does not set last_shot to first hit if miss = false' do
                 @computer.last_shot = 'A1'
                 @computer.first_hit = 'B3'
                 @computer.reset_miss
@@ -287,7 +288,7 @@ RSpec.describe ComputerBrain do
                 expect(@computer.last_shot).to eq 'A1'
             end
 
-            xit 'does set last_shot to first_hit if miss = true' do
+            it 'does set last_shot to first_hit if miss = true' do
                 @computer.last_shot = 'A1'
                 @computer.first_hit = 'B3'
                 @computer.miss = true
@@ -297,49 +298,53 @@ RSpec.describe ComputerBrain do
             end
         end
 
+        describe '#sunk' do
+            it 'checks each shot to see if the ship is sunk' do
+                @computer.store_hit('A2')
+                @computer.board.cells['A2'].fire_upon
+                @computer.sunk('A2')
+                expect(@computer.hits).to eq ['A2']
+
+                @computer.store_hit('A1')
+                @computer.board.cells['A1'].fire_upon
+                @computer.sunk('A1')
+                @computer.store_hit('A3')
+                @computer.board.cells['A3'].fire_upon
+                expect(@computer.hits).to eq ['A2', 'A1', 'A3']
+                @computer.sunk('A3')
+
+                expect(@computer.hits).to eq []
+            end
+        end
+
         describe "#hunt?" do
-            xit 'returns true if @hits has any values' do
+            it 'returns true if @hits has any values' do
                 @computer.hits << ['A3']
                 expect(@computer.hunt?).to eq true
             end
 
-            xit 'returns false if @hits has an empty array' do
+            it 'returns false if @hits has an empty array' do
                 expect(@computer.hunt?).to eq false
             end
         end
 
         describe "#shot_pick" do
-            xit 'calls a random shot if hunt? is false' do
+            it 'calls a random shot if hunt? is false' do
                 expect(@computer.shot_pick).to be_a String
             end
 
-            xit 'calls an aimed shot if hunt is true' do
+            it 'calls an aimed shot if hunt is true' do
                 @computer.store_hit('B2')
                 @computer.keys.delete('B2')
                 expect(@computer.shot_pick).to eq 'B1'
             end
         end
 
-        # describe "#hunt" do
-    
-        #     # it 'should go right with the shot after a miss' do
-        #     #     @computer.store_hit('B2')
-        #     #     @computer.keys.delete('B2')
-                
-        #     #     expect(shot).to eq 'B3'
-        #     # # end
-
-        #     # xit 'breaks the hunt if sunk? returns true' do
-        #     # end
-
-        #     # xit 'removes all hits associated with sunk ship' do
-        #     # end
-
-        #     # xit 'continues hunt if any hits are still in array' do
-        #     # end
-
-        #     # xit 'discovers both misses but has not sunk ship, switch to column hunt' do
-        #     # end
-        # end
+        describe "#level_one_brain" do
+            it 'picks a shot type(random or aimed)' do
+                @computer.level_one_brain
+                expect(@computer.set_keys).to include @computer.last_shot
+            end
+        end
     end
 end

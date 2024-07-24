@@ -108,10 +108,10 @@ class ComputerBrain
     end
 
     def sunk(shot)
-        return false unless !@board.cells.ship.sunk?            
-        # get all coordinates of ship
-        ships_coordinates.each do |coord| 
-            @hits.remove(coord)
+        if @board.cells[shot].ship.sunk?            
+            @hits.reject! { |hit| @board.cells[hit].ship.sunk?}
+        else
+            false
         end
     end
 
@@ -126,7 +126,7 @@ class ComputerBrain
 
     def level_one_brain
         shot = shot_pick
-        sunk(shot) unless !shot_check(shot)
+        sunk(shot) if shot_check(shot)
         @first_hit = @hits[0]
     end
 end
